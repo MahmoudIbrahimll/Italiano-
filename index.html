@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>سند مستحقات عميل - إيطاليانو</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Cairo & Aref Ruqaa Ink -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa+Ink:wght@700&family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <!-- html-to-image -->
+  <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.11/dist/html-to-image.js"></script>
+
+  <style>
+    * {
+      font-family: 'Cairo', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+      letter-spacing: normal !important;
+      word-spacing: normal !important;
+    }
+    body {
+      background: radial-gradient(circle at top right, #1e293b, #0f172a 70%, #020617);
+      min-height: 100vh;
+      color: #f8fafc;
+    }
+
+    /* كارت السند الرسمي المطور - محكوم وملموم بدقة بدون فراغات زائدة */
+    .receipt-card {
+      width: 100%;
+      max-width: 360px;
+      margin: 0 auto;
+      background-color: #ffffff;
+      color: #0f172a;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.35);
+      border-radius: 8px;
+      border: 3px solid #0f172a;
+      position: relative;
+    }
+
+    /* خطوط الجدول المحاسبي الملمومة */
+    .receipt-row {
+      display: flex;
+      align-items: center;
+      padding: 3px 6px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .receipt-row:last-child {
+      border-bottom: none;
+    }
+
+    /* ضمان بقاء التفقيط في سطر واحد دون النزول لسطر جديد */
+    .single-line-tafqeet {
+      white-space: nowrap !important;
+      overflow: visible;
+      display: inline-block;
+      max-width: 100%;
+    }
+
+    /* تنبيه Toast */
+    #toast {
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: translateY(120%);
+      opacity: 0;
+    }
+    #toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    /* طباعة معزولة ونظيفة */
+    @media print {
+      body {
+        background: #ffffff !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        color: #000000 !important;
+      }
+      header, #formSection, #historySection, #toast, #settingsModal, .no-print {
+        display: none !important;
+      }
+      main {
+        display: block !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .receipt-card {
+        box-shadow: none !important;
+        border: 3px solid #000 !important;
+        border-radius: 0 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+      }
+    }
+  </style>
+</head>
+<body class="p-3 sm:p-5 flex flex-col items-center">
+
+  <!-- الهيدر العلوي لوحدة التحكم -->
+  <header class="w-full max-w-4xl flex items-center justify-between pb-3.5 mb-5 border-b border-slate-800 no-print">
+    <div class="flex items-center gap-2.5">
+      <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center overflow-hidden p-1">
+        <img src="data:image/png;base64,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" alt="Italiano Logo" class="w-full h-full object-contain">
+      </div>
+      <div>
+        <h1 class="text-sm font-black text-white leading-tight">إيطاليانو للملابس الجاهزة</h1>
+        <p class="text-[10px] text-slate-400 font-medium">إصدار سندات المستحقات والتحصيل المالي</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-2">
+      <button onclick="openSettingsModal()" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-bold border border-slate-700 transition">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <span>إعدادات البنود</span>
+      </button>
+
+      <a href="#historySection" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold border border-slate-700 transition">
+        <span>السجلات (<span id="totalBadge">0</span>)</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- جسم العمل: لوحة الإدخال + المعاينة -->
+  <main class="w-full max-w-4xl grid grid-cols-1 lg:grid-cols-12 gap-6 items-start mb-6">
+    
+    <!-- عمود إدخال البيانات -->
+    <section id="formSection" class="lg:col-span-5 bg-slate-900/90 p-4 rounded-xl border border-slate-800 space-y-3 no-print shadow-xl">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+        <h2 class="text-xs font-black text-white flex items-center gap-1.5">
+          <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+          بيانات السند
+        </h2>
+        <button onclick="resetForm()" class="text-[10px] text-amber-400 hover:underline font-bold">تفريغ الخانات</button>
+      </div>
+
+      <!-- اسم العميل -->
+      <div>
+        <label class="block text-xs font-bold text-slate-300 mb-1">اسم العميل *</label>
+        <input type="text" id="inClient" placeholder="اكتب اسم العميل..." 
+               class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-white font-bold text-xs text-center focus:outline-none focus:border-amber-400">
+      </div>
+
+      <!-- المبلغ والبيان -->
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">المبلغ *</label>
+          <input type="number" id="inAmount" placeholder="0" min="0" step="any"
+                 class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-amber-400 font-extrabold text-sm text-center focus:outline-none focus:border-amber-400">
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-bold text-slate-300">البيان *</label>
+            <button type="button" onclick="openSettingsModal()" class="text-[9px] text-amber-400 hover:underline">تعديل</button>
+          </div>
+          <select id="inDesc" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-white font-bold text-xs text-center focus:outline-none focus:border-amber-400 cursor-pointer">
+            <!-- يملأ ديناميكياً -->
+          </select>
+        </div>
+      </div>
+
+      <!-- التفقيط -->
+      <div>
+        <label class="block text-[10px] font-bold text-slate-400 mb-1">التفقيط المالي التلقائي</label>
+        <input type="text" id="inTafqeet" readonly 
+               class="w-full bg-slate-800/50 border border-slate-700/60 rounded-lg px-2.5 py-1 text-xs text-amber-200/90 font-bold text-center focus:outline-none cursor-default">
+      </div>
+
+      <!-- التاريخ + اسم المعتمد المطبوع -->
+      <div class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">التاريخ</label>
+          <input type="date" id="inDate" 
+                 class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-white font-bold text-xs text-center focus:outline-none focus:border-amber-400">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-300 mb-1">اسم المعتمد (المطبوع)</label>
+          <input type="text" id="inApprover" value="أ/ عمرو الشيخ" placeholder="الاسم المطبوع..."
+                 class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-white font-bold text-xs text-center focus:outline-none focus:border-amber-400">
+        </div>
+      </div>
+
+      <!-- خانة التوقيع: كتابة اسم بخط القلم الأحمر أو إرفاق صورة توقيع حقيقي -->
+      <div>
+        <label class="block text-xs font-bold text-red-400 mb-1">التوقيع (بخط القلم الأحمر)</label>
+
+        <!-- مفتاح التبديل بين كتابة الاسم أو إرفاق صورة التوقيع -->
+        <div class="grid grid-cols-2 gap-1.5 mb-1.5">
+          <button type="button" id="btnSigModeText" onclick="setSigMode('text')"
+                  class="flex items-center justify-center gap-1 py-1.5 rounded-lg text-[10px] font-bold border transition">
+            <span>✍️</span><span>كتابة الاسم</span>
+          </button>
+          <button type="button" id="btnSigModeImage" onclick="setSigMode('image')"
+                  class="flex items-center justify-center gap-1 py-1.5 rounded-lg text-[10px] font-bold border transition">
+            <span>🖼️</span><span>إرفاق صورة توقيع</span>
+          </button>
+        </div>
+
+        <!-- وضع كتابة الاسم -->
+        <div id="sigTextMode">
+          <input type="text" id="inSigName" value="عمرو الشيخ" placeholder="الاسم في الإمضاء..." 
+                 class="w-full bg-slate-800 border border-red-500/40 rounded-lg px-2.5 py-1 text-red-300 font-bold text-xs text-center focus:outline-none focus:border-red-400">
+        </div>
+
+        <!-- وضع إرفاق صورة توقيع حقيقي -->
+        <div id="sigImageMode" class="hidden space-y-1.5">
+          <label for="inSigImageFile"
+                 class="flex flex-col items-center justify-center gap-1 w-full bg-slate-800 border border-dashed border-red-500/40 rounded-lg px-2.5 py-3 text-red-300 text-[10px] font-bold text-center cursor-pointer hover:bg-slate-700 transition">
+            <span id="sigImageUploadLabel">📎 اضغط لرفع صورة توقيعك الحقيقي (على ورقة بيضاء)</span>
+            <input type="file" id="inSigImageFile" accept="image/*" class="hidden" onchange="handleSigImageUpload(event)">
+          </label>
+          <div id="sigImagePreviewWrap" class="hidden items-center justify-between bg-white border border-slate-700 rounded-lg px-2 py-1.5">
+            <img id="sigImagePreview" class="h-8 max-w-[70%] object-contain" alt="معاينة التوقيع">
+            <button type="button" onclick="clearSigImage()" class="text-[10px] font-bold text-red-500 hover:text-red-400">إزالة ✕</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- أزرار الإجراءات -->
+      <div class="pt-2.5 border-t border-slate-800 space-y-1.5">
+        <button type="button" id="btnShareWhatsApp" onclick="handleWhatsAppAction()"
+                class="w-full flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 active:scale-[0.99] text-white font-black py-2 px-3 rounded-lg text-xs shadow-md transition">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+          <span id="btnWaText">إرسال السند كصورة عبر الواتساب</span>
+        </button>
+
+        <div class="grid grid-cols-2 gap-1.5">
+          <button type="button" onclick="window.print()" 
+                  class="flex items-center justify-center gap-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-1.5 rounded-lg border border-slate-700 text-xs transition">
+            <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+            <span>طباعة</span>
+          </button>
+          <button type="button" onclick="downloadReceiptImageOnly()" 
+                  class="flex items-center justify-center gap-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold py-1.5 rounded-lg border border-slate-700 text-xs transition">
+            <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            <span>حفظ</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- عمود المعاينة: محكوم ومضبوط تماماً -->
+    <section class="lg:col-span-7 flex flex-col items-center w-full">
+      
+      <div class="w-full max-w-[360px] flex items-center justify-between mb-1.5 px-1 text-[10px] font-bold text-slate-400 no-print">
+        <span>معاينة السند الرسمي (مضبوط في المنتصف)</span>
+        <span id="previewSerialTxt" class="font-mono text-amber-400">REF-0000</span>
+      </div>
+
+      <!-- كارت السند الرسمي المطور (عرض 360px محكوم) -->
+      <div id="receiptElement" class="receipt-card p-2 sm:p-2.5">
+        
+        <!-- الترويسة المدمجة: شارة سند مستحقات في المنتصف تماماً + لوجو HT الهندسي الأصلي الدقيق -->
+        <div class="relative flex items-center justify-between pb-1 border-b-2 border-slate-900 min-h-[34px]">
+          
+          <!-- اليمين: لوجو HT المكون من حرفي H و T الأصليين + بيانات الشركة -->
+          <div class="flex items-center gap-1.5 shrink-0 z-10">
+            <!-- الشعار الهندسي HT المطابق تماماً للصورة المرفقة -->
+            <div class="w-6 h-6 flex items-center justify-center shrink-0">
+              <img src="data:image/png;base64,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" alt="Italiano Logo" class="w-full h-full object-contain">
+            </div>
+
+            <div>
+              <h2 class="text-[11px] font-black text-slate-900 leading-tight">شركة إيطاليانو</h2>
+              <p class="text-[7.5px] font-bold text-slate-500 leading-none mt-0.5 whitespace-nowrap">للملابس الجاهزة | اداره الحسابات</p>
+            </div>
+          </div>
+          
+          <!-- المنتصف تماماً: سَنَد مُسْتَحَقَّات مثبت رياضياً في منتصف الورقة 100% -->
+          <div class="absolute left-1/2 -translate-x-1/2 text-center pointer-events-none z-0">
+            <span class="bg-slate-900 text-white text-[9px] font-black px-2.5 py-0.5 rounded shadow-sm inline-block tracking-wider whitespace-nowrap">
+              سَنَد مُسْتَحَقَّات
+            </span>
+          </div>
+
+          <!-- اليسار: رقم السند والتاريخ -->
+          <div class="text-left text-[8px] font-mono text-slate-800 font-bold leading-tight shrink-0 whitespace-nowrap z-10" dir="ltr">
+            <div><span class="text-slate-400 font-normal">NO:</span> <span id="viewSerial" class="text-slate-950 font-black">REF-260924-000</span></div>
+            <div class="mt-0.5"><span class="text-slate-400 font-normal">DATE:</span> <span id="viewDate" class="text-slate-950 font-black">2026/09/24</span></div>
+          </div>
+        </div>
+
+        <!-- جدول تفاصيل السند: بدون أي فراغات والتفقيط في سطر ممتد واحد دون نزول سطر -->
+        <div class="mt-1 border border-slate-300 rounded-md overflow-hidden text-xs">
+          
+          <!-- 1. سطر العميل: في منتصف الفريم تماماً -->
+          <div class="receipt-row py-0.5 px-2 flex items-center bg-white min-h-[24px]">
+            <span class="w-20 text-slate-500 font-extrabold text-[10px] text-right shrink-0">يُصرف للسيد/ة:</span>
+            <span id="viewClient" class="flex-1 font-black text-slate-950 text-xs sm:text-[13px] text-center truncate">اسم العميل</span>
+            <span class="w-20 shrink-0"></span>
+          </div>
+
+          <!-- 2. سطر المبلغ المستحق: الرقم فقط بحجم ثابت لا يتأثر بطول التفقيط أبداً -->
+          <div class="receipt-row py-0.5 px-2 flex items-center bg-slate-50/90">
+            <span class="w-20 text-slate-500 font-extrabold text-[10px] text-right shrink-0 leading-tight">المبلغ المستحق:</span>
+            <span id="viewAmount" class="flex-1 text-center text-lg font-black text-red-600 font-mono tracking-tight leading-tight">0</span>
+            <span class="w-20 shrink-0"></span>
+          </div>
+
+          <!-- 2.5 سطر التفقيط: يمتد بعرض السند بالكامل من البداية للنهاية ليظهر النص كاملاً حتى القوس الأخير -->
+          <div class="receipt-row py-0.5 px-2 flex items-center justify-center bg-slate-50/90">
+            <span class="single-line-tafqeet font-bold text-slate-600 leading-none text-center" id="viewTafqeet">(صفر جنيهاً مصرياً فقط لا غير)</span>
+          </div>
+
+          <!-- 3. سطر البيان: في منتصف الفريم تماماً -->
+          <div class="receipt-row py-0.5 px-2 flex items-center bg-white min-h-[24px]">
+            <span class="w-20 text-slate-500 font-extrabold text-[10px] text-right shrink-0">وذلك مقابل:</span>
+            <div class="flex-1 flex items-center justify-center gap-1 text-center">
+              <span class="text-slate-400 text-[9px]">من حـ /</span>
+              <span id="viewDesc" class="font-black text-slate-900 bg-slate-100 px-2 py-0.5 rounded border border-slate-300 text-[10px]">باقى عربون</span>
+            </div>
+            <span class="w-20 shrink-0"></span>
+          </div>
+
+        </div>
+
+        <!-- منطقة التوقيعات والختم: ملمومة ومضغوطة الارتفاع بدون مساحات فارغة زائدة -->
+        <div class="mt-0.5 pt-1 border-t border-slate-200 flex justify-between items-end text-center text-xs px-1">
+          
+          <!-- عمود اعتماد الحسابات: خط مصغر وارتفاع محكوم -->
+          <div class="flex flex-col items-center shrink-0 min-w-[85px]">
+            <span class="text-[7.5px] font-bold text-slate-400 block whitespace-nowrap leading-tight">اعتماد الحسابات</span>
+            <span class="text-[7.5px] font-black text-slate-900 whitespace-nowrap leading-tight" id="viewApprover">أ/ عمرو الشيخ</span>
+            
+            <!-- صورة الإمضاء بالقلم الأحمر -->
+            <div id="sigImgBox" class="h-4 flex items-center justify-center">
+              <img id="viewApproverSigImg" alt="توقيع" class="h-4 object-contain pointer-events-none select-none" />
+            </div>
+            
+            <!-- خط التوقيع -->
+            <div class="w-14 h-0.5 bg-slate-800 mx-auto"></div>
+          </div>
+
+          <!-- العمود الأوسط: ختم إدارة الحسابات المستطيل بدون ارتفاعات زائدة -->
+          <div class="flex flex-col items-center justify-end pb-0.5 shrink-0">
+            <div class="mb-0.5 select-none">
+              <div class="border-[1.5px] border-red-600/90 rounded-[2px] px-2 py-0.5 -rotate-1 bg-red-500/[0.04] shadow-sm">
+                <span class="text-[7.5px] font-black text-red-600 tracking-wider block whitespace-nowrap" style="letter-spacing: 0.5px;">
+                  إدارة الحسابات
+                </span>
+              </div>
+            </div>
+
+            <div class="text-[7px] text-slate-400 font-semibold whitespace-nowrap leading-tight">
+              سند استحقاق مالي رسمي معتمد
+            </div>
+          </div>
+
+          <!-- توقيع المستلم -->
+          <div class="flex flex-col items-center shrink-0 min-w-[70px] pb-0.5">
+            <span class="text-[7.5px] font-bold text-slate-400 block mb-0.5 whitespace-nowrap">توقيع المستلم</span>
+            <span class="text-[7.5px] text-slate-300 font-mono mb-0.5 leading-none">....................</span>
+            <div class="w-12 h-0.5 bg-slate-300 mx-auto"></div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- نافذة إعدادات بنود البيان (Settings Modal) -->
+  <div id="settingsModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xs w-full p-4 shadow-2xl space-y-3">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-800">
+        <h3 class="text-xs font-black text-white flex items-center gap-1">
+          <span>⚙️ خيارات البيان (من حـ /)</span>
+        </h3>
+        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-white text-xs">✕</button>
+      </div>
+
+      <!-- إضافة خيار جديد -->
+      <div class="flex gap-1">
+        <input type="text" id="newOptionInput" placeholder="أدخل بياناً جديداً..." 
+               class="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white text-center focus:outline-none focus:border-amber-400">
+        <button type="button" onclick="addNewOption()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs px-2.5 py-1 rounded-lg transition">
+          إضافة
+        </button>
+      </div>
+
+      <!-- القائمة -->
+      <div class="space-y-1 max-h-44 overflow-y-auto pr-1" id="optionsListContainer">
+        <!-- يعبأ بالجافاسكريبت -->
+      </div>
+
+      <div class="pt-2 border-t border-slate-800 flex justify-between items-center text-[10px]">
+        <button onclick="resetDefaultOptions()" class="text-red-400 hover:underline">الخيارات الافتراضية</button>
+        <button onclick="closeSettingsModal()" class="bg-slate-800 hover:bg-slate-700 text-white font-bold py-0.5 px-2.5 rounded border border-slate-700">إغلاق</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- قسم السجلات والأرشيف الخفيف -->
+  <section id="historySection" class="w-full max-w-4xl bg-slate-900/90 p-4 rounded-xl border border-slate-800 no-print mb-6">
+    <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800">
+      <h3 class="text-xs font-black text-white">أرشيف السندات الصادرة</h3>
+      <button onclick="confirmClearHistory()" class="text-[10px] text-red-400 hover:underline">مسح الأرشيف</button>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-right text-[11px] text-slate-300">
+        <thead class="text-slate-400 border-b border-slate-800 font-bold">
+          <tr>
+            <th class="p-1.5 text-center">رقم السند</th>
+            <th class="p-1.5 text-center">اسم العميل</th>
+            <th class="p-1.5 text-center">المبلغ</th>
+            <th class="p-1.5 text-center">البيان</th>
+            <th class="p-1.5 text-center">التاريخ</th>
+            <th class="p-1.5 text-center">إجراء</th>
+          </tr>
+        </thead>
+        <tbody id="historyTableBody" class="divide-y divide-slate-800">
+        </tbody>
+      </table>
+      <div id="emptyMsg" class="hidden text-center py-3 text-xs text-slate-500">لا توجد سندات محفوظة بعد</div>
+    </div>
+  </section>
+
+  <!-- تنبيه Toast -->
+  <div id="toast" class="fixed bottom-4 right-4 left-4 sm:left-auto sm:max-w-xs z-50 bg-slate-900 text-white px-3.5 py-2 rounded-lg shadow-xl border border-slate-700 flex items-center gap-2 text-xs">
+    <span class="text-emerald-400 font-black">✓</span>
+    <span id="toastMsg">تمت العملية بنجاح</span>
+  </div>
+
+  <script>
+    // ==========================================
+    // 1. التفقيط المالي العربي المختصر
+    // ==========================================
+    function tafqeetArabic(num) {
+      if (!num || isNaN(num) || num == 0) return 'صفر جنيهاً مصرياً فقط لا غير';
+      num = parseFloat(num);
+
+      const ones = ['', 'واحد', 'اثنان', 'ثلاثة', 'أربعة', 'خمسة', 'ستة', 'سبعة', 'ثمانية', 'تسعة', 'عشرة'];
+      const teens = ['عشرة', 'أحد عشر', 'اثنا عشر', 'ثلاثة عشر', 'أربعة عشر', 'خمسة عشر', 'ستة عشر', 'سبعة عشر', 'ثمانية عشر', 'تسعة عشر'];
+      const tens = ['', 'عشرة', 'عشرون', 'ثلاثون', 'أربعون', 'خمسون', 'ستون', 'سبعون', 'ثمانون', 'تسعون'];
+      const hundreds = ['', 'مائة', 'مئتان', 'ثلاثمائة', 'أربعمائة', 'خمسمائة', 'ستمائة', 'سبعمائة', 'ثمانمائة', 'تسعمائة'];
+
+      function processGroup(n) {
+        let res = [], h = Math.floor(n / 100), rem = n % 100, t = Math.floor(rem / 10), u = rem % 10;
+        if (h > 0) res.push(hundreds[h]);
+        if (rem > 0) {
+          if (rem <= 10) res.push(ones[rem]);
+          else if (rem < 20) res.push(teens[rem - 10]);
+          else {
+            if (u > 0) res.push(ones[u] + ' و' + tens[t]);
+            else res.push(tens[t]);
+          }
+        }
+        return res.join(' و');
+      }
+
+      let integerPart = Math.floor(Math.abs(num));
+      let parts = [];
+      let thousands = Math.floor(integerPart / 1000);
+      let remainder = integerPart % 1000;
+
+      if (thousands > 0) {
+        if (thousands === 1) parts.push('ألف');
+        else if (thousands === 2) parts.push('ألفان');
+        else if (thousands >= 3 && thousands <= 10) parts.push(processGroup(thousands) + ' آلاف');
+        else parts.push(processGroup(thousands) + ' ألف');
+      }
+      if (remainder > 0) parts.push(processGroup(remainder));
+
+      return (parts.join(' و') || 'صفر') + ' جنيهاً مصرياً فقط لا غير';
+    }
+
+    // ==========================================
+    // 2. إدارة خيارات البيان (LocalStorage)
+    // ==========================================
+    const DEFAULT_OPTIONS = ['باقى عربون', 'عربون', 'مرتجع', 'مرتجع اون لاين', 'تحويل بنكي', 'انستا باي', 'ف . ك'];
+    const OPTS_KEY = 'it_voucher_opts_v2';
+
+    function getOptions() {
+      try {
+        const data = localStorage.getItem(OPTS_KEY);
+        if (data) return JSON.parse(data);
+      } catch (e) {}
+      return [...DEFAULT_OPTIONS];
+    }
+
+    function saveOptions(list) {
+      localStorage.setItem(OPTS_KEY, JSON.stringify(list));
+      renderSelectOptions();
+    }
+
+    function renderSelectOptions(selectedVal = null) {
+      const opts = getOptions();
+      const select = document.getElementById('inDesc');
+      const cur = selectedVal || select.value || opts[0];
+      select.innerHTML = opts.map(o => `<option value="${o}">${o}</option>`).join('');
+      select.value = opts.includes(cur) ? cur : opts[0];
+      syncLive();
+    }
+
+    function openSettingsModal() {
+      renderModalList();
+      document.getElementById('settingsModal').classList.remove('hidden');
+      document.getElementById('settingsModal').classList.add('flex');
+      document.getElementById('newOptionInput').focus();
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settingsModal').classList.add('hidden');
+      document.getElementById('settingsModal').classList.remove('flex');
+    }
+
+    function renderModalList() {
+      const opts = getOptions();
+      const container = document.getElementById('optionsListContainer');
+      container.innerHTML = opts.map((item, idx) => `
+        <div class="flex items-center justify-between bg-slate-800 px-2 py-1 rounded border border-slate-700 text-xs">
+          <span class="text-white font-bold">${item}</span>
+          <button onclick="deleteOptionItem(${idx})" class="text-red-400 hover:text-red-300 font-bold">✕</button>
+        </div>
+      `).join('');
+    }
+
+    function addNewOption() {
+      const input = document.getElementById('newOptionInput');
+      const val = input.value.trim();
+      if (!val) return;
+      let opts = getOptions();
+      if (!opts.includes(val)) {
+        opts.push(val);
+        saveOptions(opts);
+        renderSelectOptions(val);
+        renderModalList();
+        input.value = '';
+        showToast('تمت إضافة الخيار');
+      }
+    }
+
+    function deleteOptionItem(idx) {
+      let opts = getOptions();
+      if (opts.length <= 1) return;
+      opts.splice(idx, 1);
+      saveOptions(opts);
+      renderSelectOptions();
+      renderModalList();
+      showToast('تم حذف الخيار');
+    }
+
+    function resetDefaultOptions() {
+      saveOptions([...DEFAULT_OPTIONS]);
+      renderModalList();
+      showToast('تمت استعادة الافتراضي');
+    }
+
+    // ==========================================
+    // 3. رسم وتحديث إمضاء القلم كصورة مدمجة (Canvas PNG) بارتفاع محكوم
+    //    أو عرض صورة توقيع حقيقي تم رفعها من المستخدم
+    // ==========================================
+    let sigMode = 'text'; // 'text' = اسم مكتوب بخط القلم | 'image' = صورة توقيع حقيقي مرفوعة
+    let sigImageDataUrl = null;
+
+    function updateSignatureGraphic() {
+      const img = document.getElementById('viewApproverSigImg');
+      const box = document.getElementById('sigImgBox');
+      if (!img) return;
+
+      // وضع الصورة المرفوعة: نعرض التوقيع الحقيقي بحجم أكبر وواضح وبجودة عالية
+      if (sigMode === 'image' && sigImageDataUrl) {
+        img.src = sigImageDataUrl;
+        img.style.height = '15px';
+        img.style.maxWidth = '58px';
+        img.style.width = 'auto';
+        img.style.transform = 'rotate(-1deg)';
+        img.style.imageRendering = 'auto';
+        if (box) {
+          box.style.height = '16px';
+          box.style.margin = '0';
+        }
+        return;
+      }
+
+      // إعادة الحجم الافتراضي الصغير الخاص بالإمضاء المكتوبة بخط القلم
+      img.style.height = '';
+      img.style.maxWidth = '';
+      img.style.width = '';
+      img.style.transform = '';
+      if (box) {
+        box.style.height = '';
+        box.style.margin = '';
+      }
+
+      // وضع الكتابة: نرسم الاسم كإمضاء بخط القلم الأحمر
+      const sigName = inSigName.value.trim() || 'عمرو الشيخ';
+      const canvas = document.createElement('canvas');
+      canvas.width = 180;
+      canvas.height = 46;
+      const ctx = canvas.getContext('2d');
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#dc2626';
+      ctx.font = 'bold 18px "Aref Ruqaa Ink", cursive, "Cairo", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      ctx.save();
+      ctx.translate(90, 16);
+      ctx.rotate(-0.06);
+      ctx.fillText(sigName, 0, 0);
+      ctx.restore();
+
+      ctx.strokeStyle = '#dc2626';
+      ctx.lineWidth = 1.8;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      ctx.beginPath();
+      ctx.moveTo(25, 32);
+      ctx.bezierCurveTo(55, 38, 115, 36, 155, 28);
+      ctx.bezierCurveTo(130, 34, 90, 39, 50, 40);
+      ctx.stroke();
+
+      img.src = canvas.toDataURL('image/png');
+    }
+
+    // التبديل بين وضعي التوقيع: كتابة الاسم أو إرفاق صورة توقيع حقيقي
+    function setSigMode(mode) {
+      sigMode = mode;
+      const textBtn = document.getElementById('btnSigModeText');
+      const imgBtn = document.getElementById('btnSigModeImage');
+      const textDiv = document.getElementById('sigTextMode');
+      const imgDiv = document.getElementById('sigImageMode');
+      const activeCls = ['bg-red-500/10', 'border-red-400', 'text-red-300'];
+      const inactiveCls = ['bg-slate-800', 'border-slate-700', 'text-slate-400'];
+
+      if (mode === 'image') {
+        textDiv.classList.add('hidden');
+        imgDiv.classList.remove('hidden');
+        imgBtn.classList.add(...activeCls);
+        imgBtn.classList.remove(...inactiveCls);
+        textBtn.classList.add(...inactiveCls);
+        textBtn.classList.remove(...activeCls);
+      } else {
+        imgDiv.classList.add('hidden');
+        textDiv.classList.remove('hidden');
+        textBtn.classList.add(...activeCls);
+        textBtn.classList.remove(...inactiveCls);
+        imgBtn.classList.add(...inactiveCls);
+        imgBtn.classList.remove(...activeCls);
+      }
+      updateSignatureGraphic();
+    }
+
+    // معالجة صورة التوقيع المرفوعة: قصّ الفراغ الأبيض حول التوقيع وتفريغ الخلفية
+    // لضمان ظهوره واضحاً وبدقة عالية في التصدير
+    function processSignatureImage(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            try {
+              resolve(trimAndCleanSignature(img));
+            } catch (err) {
+              reject(err);
+            }
+          };
+          img.onerror = () => reject(new Error('تعذرت قراءة الصورة'));
+          img.src = e.target.result;
+        };
+        reader.onerror = () => reject(new Error('تعذرت قراءة الملف'));
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function trimAndCleanSignature(img) {
+      const maxDim = 1000;
+      const w = img.naturalWidth || img.width;
+      const h = img.naturalHeight || img.height;
+      const scale = Math.min(1, maxDim / Math.max(w, h));
+      const cw = Math.max(1, Math.round(w * scale));
+      const ch = Math.max(1, Math.round(h * scale));
+
+      const srcCanvas = document.createElement('canvas');
+      srcCanvas.width = cw;
+      srcCanvas.height = ch;
+      const sctx = srcCanvas.getContext('2d');
+      sctx.drawImage(img, 0, 0, cw, ch);
+
+      const whiteThreshold = 235;
+      let minX = cw, minY = ch, maxX = -1, maxY = -1;
+      let data;
+      try {
+        data = sctx.getImageData(0, 0, cw, ch).data;
+      } catch (e) {
+        // في حال منع الوصول لبيانات الصورة (مصدر خارجي)، نعرضها كما هي بدون معالجة
+        return srcCanvas.toDataURL('image/png');
+      }
+
+      for (let y = 0; y < ch; y++) {
+        for (let x = 0; x < cw; x++) {
+          const idx = (y * cw + x) * 4;
+          const r = data[idx], g = data[idx + 1], b = data[idx + 2], a = data[idx + 3];
+          if (a > 10 && !(r > whiteThreshold && g > whiteThreshold && b > whiteThreshold)) {
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+          }
+        }
+      }
+
+      if (maxX < 0) {
+        // لم يتم العثور على توقيع واضح داخل الصورة: نعرضها كاملة بدون قص
+        minX = 0; minY = 0; maxX = cw - 1; maxY = ch - 1;
+      }
+
+      const pad = Math.round(Math.max(cw, ch) * 0.03);
+      minX = Math.max(0, minX - pad);
+      minY = Math.max(0, minY - pad);
+      maxX = Math.min(cw - 1, maxX + pad);
+      maxY = Math.min(ch - 1, maxY + pad);
+
+      const cropW = maxX - minX + 1;
+      const cropH = maxY - minY + 1;
+
+      const outCanvas = document.createElement('canvas');
+      outCanvas.width = cropW;
+      outCanvas.height = cropH;
+      const octx = outCanvas.getContext('2d');
+      octx.drawImage(srcCanvas, minX, minY, cropW, cropH, 0, 0, cropW, cropH);
+
+      // تفريغ الخلفية البيضاء لضمان ظهور نظيف فوق تصميم السند
+      const outData = octx.getImageData(0, 0, cropW, cropH);
+      const od = outData.data;
+      for (let i = 0; i < od.length; i += 4) {
+        const r = od[i], g = od[i + 1], b = od[i + 2];
+        if (r > whiteThreshold && g > whiteThreshold && b > whiteThreshold) {
+          od[i + 3] = 0;
+        }
+      }
+      octx.putImageData(outData, 0, 0);
+
+      return outCanvas.toDataURL('image/png');
+    }
+
+    async function handleSigImageUpload(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const uploadLabel = document.getElementById('sigImageUploadLabel');
+      const originalText = uploadLabel.innerText;
+      uploadLabel.innerText = '⏳ جارِ معالجة التوقيع...';
+
+      try {
+        const dataUrl = await processSignatureImage(file);
+        sigImageDataUrl = dataUrl;
+
+        const preview = document.getElementById('sigImagePreview');
+        preview.src = dataUrl;
+        const previewWrap = document.getElementById('sigImagePreviewWrap');
+        previewWrap.classList.remove('hidden');
+        previewWrap.classList.add('flex');
+
+        updateSignatureGraphic();
+        showToast('تم رفع التوقيع بنجاح');
+      } catch (err) {
+        showToast('تعذرت معالجة الصورة، برجاء تجربة صورة أخرى');
+      } finally {
+        uploadLabel.innerText = originalText;
+      }
+    }
+
+    function clearSigImage() {
+      sigImageDataUrl = null;
+      const fileInput = document.getElementById('inSigImageFile');
+      if (fileInput) fileInput.value = '';
+      const previewWrap = document.getElementById('sigImagePreviewWrap');
+      previewWrap.classList.add('hidden');
+      previewWrap.classList.remove('flex');
+      updateSignatureGraphic();
+    }
+
+    // ==========================================
+    // 4. التحديث المباشر للمعاينة
+    // ==========================================
+    const inClient = document.getElementById('inClient');
+    const inAmount = document.getElementById('inAmount');
+    const inDesc = document.getElementById('inDesc');
+    const inApprover = document.getElementById('inApprover');
+    const inSigName = document.getElementById('inSigName');
+    const inDate = document.getElementById('inDate');
+    const inTafqeet = document.getElementById('inTafqeet');
+
+    const viewClient = document.getElementById('viewClient');
+    const viewAmount = document.getElementById('viewAmount');
+    const viewDesc = document.getElementById('viewDesc');
+    const viewApprover = document.getElementById('viewApprover');
+    const viewDate = document.getElementById('viewDate');
+    const viewTafqeet = document.getElementById('viewTafqeet');
+    const viewSerial = document.getElementById('viewSerial');
+    const previewSerialTxt = document.getElementById('previewSerialTxt');
+
+    let currentSerial = '';
+
+    function genSerial(dateStr) {
+      const d = dateStr ? dateStr.replace(/-/g, '') : '2026';
+      return `REF-${d.slice(2)}-${Math.floor(100 + Math.random() * 900)}`;
+    }
+
+    function initDate() {
+      const now = new Date();
+      inDate.value = now.toISOString().slice(0, 10);
+      currentSerial = genSerial(inDate.value);
+    }
+
+    // يقلل حجم خط التفقيط تدريجياً (خطوة 0.1px) لحين احتواء النص كاملاً في عرض السطر دون أي قطع أو نقاط حذف
+    function autoFitTafqeet() {
+      const el = viewTafqeet;
+      const container = el.parentElement;
+      let fontSize = 9.5;
+      el.style.fontSize = fontSize + 'px';
+      const maxWidth = container.clientWidth - 4;
+      let guard = 0;
+      while (el.scrollWidth > maxWidth && fontSize > 5.5 && guard < 200) {
+        fontSize -= 0.1;
+        el.style.fontSize = fontSize.toFixed(1) + 'px';
+        guard++;
+      }
+    }
+
+    function syncLive() {
+      const name = inClient.value.trim() || 'اسم العميل';
+      const amt = inAmount.value !== '' ? inAmount.value : '0';
+      const desc = inDesc.value || '';
+      const approver = inApprover.value.trim() || 'أ/ عمرو الشيخ';
+      const tafText = tafqeetArabic(amt);
+
+      inTafqeet.value = tafText;
+      viewClient.innerText = name;
+      viewAmount.innerText = Number(amt).toLocaleString('en-US');
+      viewTafqeet.innerText = `(${tafText})`;
+      viewDesc.innerText = desc;
+      viewApprover.innerText = approver;
+
+      // ضبط حجم الخط آلياً بشكل تدريجي ودقيق لضمان ظهور التفقيط كاملاً في سطر واحد ممتد بدون أي نقط حذف
+      autoFitTafqeet();
+
+      updateSignatureGraphic();
+
+      if (inDate.value) {
+        const [y, m, d] = inDate.value.split('-');
+        viewDate.innerText = `${y}/${m}/${d}`;
+      }
+
+      viewSerial.innerText = currentSerial;
+      previewSerialTxt.innerText = currentSerial;
+    }
+
+    [inClient, inAmount, inDesc, inApprover, inSigName, inDate].forEach(el => {
+      el.addEventListener('input', syncLive);
+      el.addEventListener('change', syncLive);
+    });
+
+    function resetForm() {
+      inClient.value = '';
+      inAmount.value = '';
+      inSigName.value = 'عمرو الشيخ';
+      clearSigImage();
+      setSigMode('text');
+      initDate();
+      currentSerial = genSerial(inDate.value);
+      syncLive();
+      inClient.focus();
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      document.getElementById('toastMsg').innerText = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
+    // ==========================================
+    // 5. تصدير مباشر ومحكوم بعرض 360px
+    // ==========================================
+    async function captureCanvas() {
+      const original = document.getElementById('receiptElement');
+      if (document.fonts) await document.fonts.ready;
+      updateSignatureGraphic();
+      await new Promise(r => setTimeout(r, 60));
+
+      const wrapper = document.createElement('div');
+      wrapper.style.position = 'fixed';
+      wrapper.style.top = '-9999px';
+      wrapper.style.left = '-9999px';
+      wrapper.style.width = '360px';
+      wrapper.style.zIndex = '-9999';
+
+      const clone = original.cloneNode(true);
+      clone.style.width = '360px';
+      clone.style.maxWidth = '360px';
+      clone.style.margin = '0';
+      clone.style.boxShadow = 'none';
+
+      wrapper.appendChild(clone);
+      document.body.appendChild(wrapper);
+
+      await new Promise(r => setTimeout(r, 80));
+
+      let canvas;
+      try {
+        canvas = await htmlToImage.toCanvas(clone, {
+          pixelRatio: 3,
+          backgroundColor: '#ffffff',
+          cacheBust: true,
+          width: 360,
+          height: clone.offsetHeight
+        });
+      } finally {
+        document.body.removeChild(wrapper);
+      }
+      return canvas;
+    }
+
+    const HIST_KEY = 'it_voucher_hist_v2';
+    function saveToArchive() {
+      const item = {
+        serial: currentSerial,
+        client: inClient.value.trim() || 'بدون اسم',
+        amount: inAmount.value || '0',
+        desc: inDesc.value,
+        approver: inApprover.value,
+        sigName: inSigName.value,
+        sigMode: sigMode,
+        sigImageDataUrl: sigMode === 'image' ? sigImageDataUrl : null,
+        date: inDate.value
+      };
+      let list = JSON.parse(localStorage.getItem(HIST_KEY) || '[]');
+      list = list.filter(x => x.serial !== item.serial);
+      list.unshift(item);
+      try {
+        localStorage.setItem(HIST_KEY, JSON.stringify(list));
+      } catch (e) {
+        // في حال امتلاء مساحة التخزين بسبب حجم صور التوقيعات، نحفظ بدون صورة التوقيع
+        item.sigImageDataUrl = null;
+        list[0] = item;
+        localStorage.setItem(HIST_KEY, JSON.stringify(list));
+      }
+      renderArchive();
+    }
+
+    function renderArchive() {
+      const list = JSON.parse(localStorage.getItem(HIST_KEY) || '[]');
+      const tbody = document.getElementById('historyTableBody');
+      const emptyMsg = document.getElementById('emptyMsg');
+      document.getElementById('totalBadge').innerText = list.length;
+
+      if (!list.length) {
+        tbody.innerHTML = '';
+        emptyMsg.classList.remove('hidden');
+        return;
+      }
+      emptyMsg.classList.add('hidden');
+      tbody.innerHTML = list.map(x => `
+        <tr class="hover:bg-slate-800/40">
+          <td class="p-1.5 font-mono text-amber-400 font-bold text-center">${x.serial}</td>
+          <td class="p-1.5 text-white font-bold text-center">${x.client}</td>
+          <td class="p-1.5 font-mono text-slate-200 text-center">${Number(x.amount).toLocaleString('en-US')} ج.م</td>
+          <td class="p-1.5 text-slate-400 text-center">${x.desc}</td>
+          <td class="p-1.5 font-mono text-slate-400 text-center">${x.date}</td>
+          <td class="p-1.5 text-center">
+            <button onclick="loadFromArchive('${x.serial}')" class="text-amber-400 hover:underline">فتح</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function loadFromArchive(serial) {
+      const list = JSON.parse(localStorage.getItem(HIST_KEY) || '[]');
+      const it = list.find(x => x.serial === serial);
+      if (!it) return;
+      inClient.value = it.client;
+      inAmount.value = it.amount;
+      if (it.approver) inApprover.value = it.approver;
+      if (it.sigName) inSigName.value = it.sigName;
+      if (it.sigMode === 'image' && it.sigImageDataUrl) {
+        sigImageDataUrl = it.sigImageDataUrl;
+        document.getElementById('sigImagePreview').src = it.sigImageDataUrl;
+        const previewWrap = document.getElementById('sigImagePreviewWrap');
+        previewWrap.classList.remove('hidden');
+        previewWrap.classList.add('flex');
+        setSigMode('image');
+      } else {
+        clearSigImage();
+        setSigMode('text');
+      }
+      renderSelectOptions(it.desc);
+      inDate.value = it.date;
+      currentSerial = it.serial;
+      syncLive();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function confirmClearHistory() {
+      localStorage.removeItem(HIST_KEY);
+      renderArchive();
+      showToast('تم مسح الأرشيف');
+    }
+
+    async function downloadReceiptImageOnly() {
+      saveToArchive();
+      showToast('جاري تصدير الصورة...');
+      const canvas = await captureCanvas();
+      const a = document.createElement('a');
+      a.download = `سند_${inClient.value || 'عميل'}.png`;
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+      showToast('تم التنزيل بنجاح');
+    }
+
+    async function handleWhatsAppAction() {
+      const btn = document.getElementById('btnShareWhatsApp');
+      const btnText = document.getElementById('btnWaText');
+      btnText.innerText = 'جاري المعالجة...';
+      btn.disabled = true;
+      saveToArchive();
+
+      try {
+        const canvas = await captureCanvas();
+        canvas.toBlob(async (blob) => {
+          const file = new File([blob], `سند_${inClient.value || 'عميل'}.png`, { type: 'image/png' });
+
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            try {
+              await navigator.share({ files: [file], title: 'سند مستحقات - إيطاليانو' });
+              btnText.innerText = 'إرسال السند كصورة عبر الواتساب';
+              btn.disabled = false;
+              return;
+            } catch (e) {}
+          }
+
+          const a = document.createElement('a');
+          a.download = `سند_${inClient.value || 'عميل'}.png`;
+          a.href = URL.createObjectURL(blob);
+          a.click();
+
+          setTimeout(() => window.open('https://web.whatsapp.com/', '_blank'), 300);
+          showToast('تم حفظ الصورة! الصقها مباشرة في محادثة الواتساب');
+          btnText.innerText = 'إرسال السند كصورة عبر الواتساب';
+          btn.disabled = false;
+        }, 'image/png');
+      } catch (e) {
+        btnText.innerText = 'إرسال السند كصورة عبر الواتساب';
+        btn.disabled = false;
+      }
+    }
+
+    // ==========================================
+    // 6. التشغيل الأولي
+    // ==========================================
+    window.addEventListener('DOMContentLoaded', () => {
+      initDate();
+      renderSelectOptions();
+      renderArchive();
+      setSigMode('text');
+      if (document.fonts) {
+        document.fonts.ready.then(updateSignatureGraphic);
+      } else {
+        updateSignatureGraphic();
+      }
+    });
+  </script>
+</body>
+</html>
